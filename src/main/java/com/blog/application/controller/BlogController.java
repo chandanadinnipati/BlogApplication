@@ -1,7 +1,7 @@
 package com.blog.application.controller;
 
 import com.blog.application.entity.Comments;
-import com.blog.application.entity.Login;
+import com.blog.application.entity.User;
 import com.blog.application.entity.posts;
 import com.blog.application.entity.tags;
 import com.blog.application.service.AppService;
@@ -24,13 +24,14 @@ import java.util.Comparator;
 import java.util.List;
 
 @Controller
-public class blogController {
-    PostsDTO postsDTO = new PostsDTO();
+public class BlogController {
+    PostsDTO postsDTO;
     AppService appService;
 
     @Autowired
-    public blogController(AppService postservice) {
+    public BlogController(AppService postservice,PostsDTO postsDTO) {
         this.appService = postservice;
+        this.postsDTO = postsDTO;
     }
 
     @GetMapping("/")
@@ -46,21 +47,19 @@ public class blogController {
         return "home";
     }
 
-    @RequestMapping("/sort")
+    @GetMapping("/sort")
     public String sort(Model model,
                        @RequestParam(value = "page", defaultValue = "0") int page,
                        @RequestParam(value = "size", defaultValue = "10") int size,
-                       @RequestParam("sort") String st,
+                       @RequestParam("sort") String sortBy,
                        @ModelAttribute("postData") PostsDTO p) {
-        List<posts> postsList = p.getPostsList();
+        List<posts> posts = p.getPostsList();
         Pageable pageable = PageRequest.of(page, size);
         Page<posts> postPage = null;
-        if (st.equals("desc")) {
-            Collections.sort(postsList, Comparator.comparing(posts::getPublishedAt).reversed());
-            postPage = appService.sortPostsByPublishedDateDescending(postsList, pageable);
+        if (sortBy.equals("desc")) {
+            postPage = appService.sortPostsByPublishedDateDescending(posts, pageable);
         } else {
-            Collections.sort(postsList, Comparator.comparing(posts::getPublishedAt));
-            postPage = appService.sortPostsByPublishedDateAscending(postsList, pageable);
+            postPage = appService.sortPostsByPublishedDateAscending(posts, pageable);
         }
         postsDTO.setPostsList(postPage.getContent());
         model.addAttribute("postData", postsDTO);
@@ -234,15 +233,13 @@ public class blogController {
 
     @GetMapping("/register")
     public String register(Model model) {
-        Login l = new Login();
+        User l = new User();
         model.addAttribute("login", l);
         return "CreateUser";
     }
 
     @GetMapping("/save-login")
-    public String saveLogin(@ModelAttribute("login") Login l) {
-        l.setPassword("{noop}" + l.getPassword());
-        System.out.println(l);
+    public String saveLogin(@ModelAttribute("login") User l) {
         appService.saveLogin(l);
         return "redirect:/login";
     }

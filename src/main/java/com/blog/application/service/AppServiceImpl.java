@@ -1,7 +1,7 @@
 package com.blog.application.service;
 
 import com.blog.application.dao.CommentsDao;
-import com.blog.application.dao.LoginDao;
+import com.blog.application.dao.UserDao;
 import com.blog.application.dao.PostDao;
 import com.blog.application.dao.TagDao;
 import com.blog.application.entity.*;
@@ -16,19 +16,22 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+
+import org.springframework.security.crypto.password.PasswordEncoder;
+
 @Service
 public class AppServiceImpl implements AppService{
     private PostDao postDao;
     private TagDao tagDao;
     private CommentsDao commentsDao;
-    private LoginDao loginDao;
+    private UserDao userDao;
 
     @Autowired
-    AppServiceImpl(PostDao post, TagDao tag, CommentsDao comment, LoginDao login){
+    AppServiceImpl(PostDao post, TagDao tag, CommentsDao comment, UserDao login){
         this.postDao =post;
         this.tagDao =tag;
         this.commentsDao =comment;
-        this.loginDao =login;
+        this.userDao =login;
     }
 
     public void savePosts(posts post){
@@ -89,6 +92,7 @@ public class AppServiceImpl implements AppService{
 
 
     public Page<posts> sortPostsByPublishedDateAscending(List<posts> post, Pageable pageable) {
+        Collections.sort(post, Comparator.comparing(posts::getPublishedAt));
         int start = (int) pageable.getOffset();
         int end = Math.min((start + pageable.getPageSize()), post.size());
         List<posts> pageContent = post.subList(start, end);
@@ -129,8 +133,9 @@ public class AppServiceImpl implements AppService{
         return postDao.searchBlogPosts(text,pageable);
     }
 
-    public void saveLogin(Login l){
-        loginDao.save(l);
+    public void saveLogin(User user){
+        user.setPassword("{noop}"+user.getPassword());
+        userDao.save(user);
     }
 
 

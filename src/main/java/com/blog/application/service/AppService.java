@@ -1,7 +1,7 @@
 package com.blog.application.service;
 
 import com.blog.application.entity.Comments;
-import com.blog.application.entity.Login;
+import com.blog.application.entity.User;
 import com.blog.application.entity.posts;
 import com.blog.application.entity.tags;
 import org.springframework.data.domain.Page;
@@ -31,5 +31,5 @@ public interface AppService {
     public Comments findCommentById(int id);
     public void deleteCommentById(int id);
 
-    public void saveLogin(Login l);
+    public void saveLogin(User l);
 }
