@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog Post</title>
+    <style>
+        /* General styling */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Header styling */
+        header {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 5%;
+            box-sizing: border-box;
+        }
+
+        .delete-edit {
+            display: flex;
+            align-items: center;
+            gap: 10px; /* Space between Edit and Delete buttons */
+        }
+
+        /* Button styling for anchor tags */
+        .anchor {
+            padding: 10px;
+            width: 100px;
+            text-align: center;
+            font-weight: bold;
+            display: inline-block;
+            background-color: #6d6969;
+            color: #faf6f6;
+            border: none;
+            border-radius: 4px;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        /* Main content styling */
+        .content {
+            max-width: 90%;
+            width: 100%;
+            text-align: center;
+            margin: 20px auto;
+            padding: 0 5%;
+            box-sizing: border-box;
+        }
+
+        /* Title styling */
+        .title {
+            font-size: 48px;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+
+        /* Author and date styling */
+        .author {
+            font-size: 18px;
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        /* Post body styling */
+        .post-body {
+            font-size: 18px;
+            line-height: 1.6;
+            text-align: justify;
+            margin: 30px auto 20px;
+            padding: 5px;
+            width: 70%;
+        }
+        <style>
+    /* Flex container for each comment */
+    .comment-content-wrapper {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px; /* Space between the comment details and buttons */
+    }
+
+    .comment-details {
+        flex: 1; /* Ensures the comment details take up the available space */
+    }
+
+    /* Buttons for actions */
+    .comment-actions {
+        display: inline-block;
+        float:right;
+        gap: 10px; /* Space between buttons */
+    }
+
+    .action-button {
+        transition: background-color 0.3s ease;
+          padding: 10px;
+            width: 100px;
+            height: 15px;
+            align-content:center;
+            text-align: center;
+            font-weight: bold;
+            display: inline-block;
+            background-color: #6d6969;
+            color: #faf6f6;
+            border: none;
+            border-radius: 4px;
+            text-decoration: none;
+            cursor: pointer;
+    }
+
+    .action-button:hover {
+        background-color: #4a4848;
+    }
+
+    /* Adjust the spacing in the list */
+    .comments-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .comment-item {
+        display: flex;
+        flex-direction: column;
+        padding: 15px 10px;
+        margin-bottom: 15px;
+        border-bottom: 1px solid #ddd;
+    }
+
+    .comment-item:last-child {
+        border-bottom: none;
+    }
+
+
+    /* Comments Section Styling */
+    .comments-section {
+        width: 70%;
+        margin: 40px auto;
+        padding: 20px;
+        background-color: #f9f9f9;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+    }
+
+    .comments-section h2 {
+        font-size: 24px;
+        margin-bottom: 20px;
+        color: #333;
+    }
+
+    .comments-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .comments-list li {
+        padding: 15px 10px;
+        margin-bottom: 15px;
+        border-bottom: 1px solid #ddd;
+    }
+
+    .comments-list li:last-child {
+        border-bottom: none;
+    }
+
+    .comment-author {
+        font-weight: bold;
+        font-size: 16px;
+        color: #555;
+    }
+
+    .comment-date {
+        font-size: 14px;
+        color: #999;
+        margin-bottom: 5px;
+    }
+
+    .comment-content {
+        font-size: 16px;
+        line-height: 1.5;
+        color: #333;
+    }
+
+
+
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>My Blog Application</h1>
+    <div class="delete-edit" th:object="${postdata}">
+        <a th:href="@{/update/{id}(id=${postdata.id})}" class="anchor">Edit</a>
+        <a th:href="@{/delete/{id}(id=${postdata.id})}" class="anchor">Delete</a>
+        <a th:href="@{/comment/{id}(id=${postdata.id})}" class="anchor">Comment</a>
+    </div>
+</header>
+
+<div class="content" th:each="data:${postdata}">
+    <div class="title" th:text="${data.title}"></div>
+    <div class="author" th:text="${data.author} + ', ' + ${data.publishedAt}"></div>
+    <div class="post-body">
+        <p th:text="${data.content}"></p>
+    </div>
+</div>
+<div class="comments-section">
+    <h2>Comments</h2>
+    <ul class="comments-list" th:each="c : ${commentsList}">
+        <li>
+            <div class="comment-author" th:text="${c.name}"></div>
+            <p class="comment-content" th:text="${c.comment}"></p>
+            <div class="comment-actions">
+                <a th:href="@{/comment/update/{id}/{post_id}(id=${c.id}, post_id=${postdata.id})}" class="action-button">Update</a>
+                <a th:href="@{/comment/delete/{id}/{post_id}(id=${c.id}, post_id=${postdata.id})}" class="action-button">Delete</a>
+            </div>
+        </li>
+    </ul>
+</div>
+
+
+</body>
+</html>

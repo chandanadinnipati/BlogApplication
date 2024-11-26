@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Blog Application</title>
+    <style>
+        body {
+    font-family: Arial, sans-serif;
+    }
+
+
+    header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-left: 5%;
+    }
+
+    .search-login {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    margin-right: 10px;
+    }
+    .search-login input[type="text"] {
+             padding: 10px;
+             width: 200px;
+             margin-right: 10px;
+             margin-left: 10px;
+        }
+    .search-login button {
+            text-align: center;
+             padding: 10px;
+             width: 100px;
+             margin-right: 10px;
+        }
+    .filters {
+    display: flex;
+    justify-content: right;
+    align-items: center;
+    margin: 20px 20px;
+    padding-right: 10px;
+
+    }
+    .filters select {
+            text-align: center;
+            padding: 10px;
+            width: 200px;
+            margin-right: 10px;
+        }
+
+    .blog-container {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(100px, 1fr));
+    gap: 20px;
+    padding: 30px;
+    width: 80%;
+    margin: 0 auto;
+    justify-items: center;
+    }
+
+    .blog-post {
+    border: 1px solid #000;
+    padding: 15px;
+    border-radius: 5px;
+    height: 200px;
+    width: 95%; /* Adjust as needed */
+    overflow: auto;
+    }
+
+    .blog-post h2 {
+        font-size: 24px;
+        margin-bottom: 10px;
+    }
+
+    .blog-post p {
+        font-size: 16px;
+        line-height: 1.5;
+        margin-bottom: 10px;
+    }
+
+    .blog-post .author {
+        font-weight: bold;
+        margin-bottom: 10px;
+    }
+
+
+    .pagination {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+    }
+    .pagination button {
+             padding: 10px;
+             width: 150px;
+             margin-right: 10px;
+             text-align: center;
+
+        }
+        .anchor{
+    <!--     font-size: 28px;          /* Increase font size to make it prominent */-->
+    font-weight: bold;        /* Make it bold */
+    color: #333;              /* Dark color for readability */
+    text-decoration: none;    /* Remove the underline */
+    <!--    margin: 20px 0;           /* Add some margin around the title */-->
+    display: block;           /* Display as a block for better spacing */
+
+        }
+        .anchor-button {
+                padding: 10px;
+                width: 100px;
+                text-align: center;
+                font-weight: bold;
+                display: inline-block;
+                background-color: #6d6969;
+                color: #faf6f6;
+                border: none;
+                border-radius: 4px;
+                text-decoration: none;
+                cursor: pointer;
+            }
+         .search-login select {
+            text-align: center;
+            padding: 10px;
+            width: 200px;
+            margin-right: 10px;
+        }
+          .search-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-radius: 30px;
+    padding: 10px 20px;
+    width: 0%;
+}
+
+.search-container .input-field {
+    border: 1px solid #ccc;
+    padding: 10px;
+    border-radius: 25px;
+    font-size: 14px;
+    margin-right: 15px;
+    outline: none;
+    width: 220px;
+}
+
+.search-container .input-field::placeholder {
+    color: #888;
+}
+.search-container .search-button {
+    background-color: #b1b3b6;
+    padding: 12px 25px;
+    border-radius: 25px;
+    font-size: 14px;
+    border: none;
+    cursor: pointer;
+}
+i {
+    margin-right: 5px;
+}
+    </style>
+</head>
+<body>
+<header>
+    <h1>My Blog Application</h1>
+    <div class="search-login">
+        <a th:href="@{/createblog}" class="anchor-button">create</a>
+        <form th:action="@{/search}" method="get" >
+        <input type="text" placeholder="Search" name="search"  >
+        </form>
+
+        <form action="/logout" method="post">
+            <button>Logout</button>
+        </form>
+    </div>
+</header>
+
+<div class="filters">
+    <div class="search-container-wrapper">
+        <form th:action="@{filter}">
+        <div th:if="${searchbar}" class="search-container">
+            <i>Author:</i><input type="text" name="author" placeholder="Enter Author" class="input-field">
+            <i>Tag:</i><input type="text" name="tag" placeholder="Enter Tag" class="input-field">
+            <i>publishedAt:</i><input type="date" name="publishedAt" placeholder="PublisedAt" class="input-field">
+
+            <button class="search-button">
+                <span>Search</span>
+            </button>
+        </div>
+        </form>
+    </div>
+    <form th:action="@{/filter-search}" class="search-login">
+        <button >Filter</button>
+    </form>
+    <form th:action="@{/sort}" th:object="${postData}" method="get">
+        <input type="hidden" name="posts" th:field="*{postsList}">
+        <select id="sort" name="sort" onchange="this.form.submit()">
+            <option value="">Sort</option>
+            <option value="asc" >Past</option>
+            <option value="desc" >Recent</option>
+        </select>
+    </form>
+</div>
+
+<div class="blog-container" >
+    <div class="blog-post" th:each="p : ${postData.postsList}" >
+        <a th:href="@{/post/{id}(id=${p.id})}" class="anchor">
+            <h2 th:text="${p.title}"></h2>
+            <div class="author" th:text="${p.author}+','+${p.publishedAt}" ></div>
+            <p th:text="${p.excerpt}"></p>
+        </a>
+    </div>
+</div>
+<div class="pagination">
+    <span th:if="${postPage.hasPrevious()}">
+    <a th:href="@{'/?page=' + ${postPage.number - 1} + '&size=' + ${postPage.size}}" class="anchor-button">Previous</a>
+  </span>
+    <span th:text="'Page:' +${postPage.number + 1}+' / '+ ${postPage.totalPages}"></span>
+    <span th:if="${postPage.hasNext()}">
+        <a th:href="@{'/?page=' + (${postPage.number + 1}) + '&size=' + ${postPage.size}}" class="anchor-button">Next</a>
+    </span>
+</div>
+</body>
+</html>
+
+
+
