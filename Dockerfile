@@ -1,12 +1,8 @@
-# Stage 1: Build the application
-FROM maven:3.9.9-ibm-semeru-23-jammy AS build
-WORKDIR /app
+FROM maven:3.9.4-eclipse-temurin-21-alpine AS build
 COPY . .
 RUN mvn clean package -DskipTests
 
-# Stage 2: Run the application
-FROM openjdk:23-jdk-slim
-WORKDIR /app
-COPY --from=build /app/target/BlogApplication-0.0.1-SNAPSHOT.jar BlogApplication.jar
+FROM openjdk:21-jdk-slim
+COPY --from=build /target/BlogApplication-0.0.1-SNAPSHOT.jar BlogProject.jar
 EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "BlogApplication.jar"]
+ENTRYPOINT ["java", "-jar", "BlogProject.jar"]
